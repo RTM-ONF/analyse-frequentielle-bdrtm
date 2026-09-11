@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 ##### A MODIFIER EN CAS DE MAJ #####
-min_year = 1000
+min_year = 1900
 
 max_year = 2026
 
@@ -55,6 +55,10 @@ with st.sidebar:
                                             echelles,
                                     )
 
+    # st.session_state.liste = st.text_input("Sélection")
+
+    # st.session_state.regrouper = st.checkbox("Regrouper la sélection")
+
     st.header("Filtres")
 
     st.session_state.departements = st.multiselect("Départements",
@@ -62,9 +66,9 @@ with st.sidebar:
                                     )
 
     st.session_state.annee_min, st.session_state.annee_max = st.slider("Période",
-                                                                      min_value=min_year,
-                                                                      max_value=max_year,
-                                                                      value=(min_year, max_year)
+                                                                       min_value=min_year,
+                                                                       max_value=max_year,
+                                                                       value=(2000, max_year)
                                                             )
 
     st.session_state.phenomenes = st.multiselect("Phénomènes",
@@ -79,5 +83,4 @@ pg = st.navigation([
 
 st.session_state.df = load_data()
 
-# Exécution de la page sélectionnée
 pg.run()

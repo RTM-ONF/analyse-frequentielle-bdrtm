@@ -3,60 +3,55 @@ import pandas as pd
 from scipy.stats import chi2
 import streamlit as st
 
+
 st.title("Analyse fréquentielle de la BDRTM")
 
 st.header("Données")
 
 df = st.session_state.df
+
 if st.session_state.departements != []:
     departements = [departement[:2] for departement in st.session_state.departements]
-    df = df[df["Dept"].isin(departements)]
+    df = df[df["Département"].isin(departements)]
 
-df = df[df["an_evt"].between(st.session_state.annee_min, st.session_state.annee_max)]
+df = df[df["Année"].between(st.session_state.annee_min, st.session_state.annee_max)]
 
 if st.session_state.phenomenes != []:
     phenomenes = [phenomene[0] for phenomene in st.session_state.phenomenes]
-    df = df[df["EV_pheno"].isin(phenomenes)]
+    df = df[df["Phénomène"].isin(phenomenes)]
 
 if st.session_state.echelle == "Département":
-    df = df[["Dept", "an_evt", "EV_pheno"]]
+    df = df[["Département", "Année", "Phénomène"]]
 
 if st.session_state.echelle == "EPCI":
-    df["epci"] = df["epci"].str.split(",")
-    df = df.explode("epci")
-    df = df[["Dept", "an_evt", "epci", "EV_pheno"]]
+    df["EPCI"] = df["EPCI"].str.split(",")
+    df = df.explode("EPCI")
+    df = df[["Département", "Année", "EPCI", "Phénomène"]]
 
 if st.session_state.echelle == "Commune":
-    df["SI_communes"] = df["SI_communes"].str.split(";")
-    df = df.explode("SI_communes")
-    df = df[["Dept", "an_evt", "SI_communes", "EV_pheno"]]
+    df["Commune"] = df["Commune"].str.split(";")
+    df = df.explode("Commune")
+    df = df[["Département", "Année", "Commune", "Phénomène"]]
 
 if st.session_state.echelle == "Site":
-    df = df[["Dept", "an_evt", "SI_code", "EV_pheno"]]
+    df = df[["Département", "Année", "Site", "Phénomène"]]
 
-st.write(df)
+st.dataframe(df, hide_index=True)
 
 st.write(f"{len(df)} événements.")
 
 st.header("Analyse fréquentielle")
-
-echelles = {
-    "Département": "Dept",
-    "EPCI": "epci",
-    "Commune": "SI_communes",
-    "Site": "SI_code"
-}
 
 if st.session_state.phenomenes == []:
     all_pheno = "_".join(["A", "E", "G", "I", "P", "T"])
 elif len(st.session_state.phenomenes) > 1:
     all_pheno = "_".join([phenomene[0] for phenomene in st.session_state.phenomenes])
 
-table_1 = df.groupby([echelles[st.session_state.echelle], "EV_pheno"]).size().reset_index(name="nb_evt")
+table_1 = df.groupby([st.session_state.echelle, "Phénomène"]).size().reset_index(name="Nombre d'événements")
 
 if len(st.session_state.phenomenes) > 1 or st.session_state.phenomenes == []:
-    table_2 = df.groupby(echelles[st.session_state.echelle]).size().reset_index(name="nb_evt")
-    table_2["EV_pheno"] = all_pheno
+    table_2 = df.groupby(st.session_state.echelle).size().reset_index(name="Nombre d'événements")
+    table_2["Phénomène"] = all_pheno
     df = pd.concat([table_1, table_2])
     df.reset_index(drop=True)
 else:
@@ -65,30 +60,31 @@ else:
 
 T = st.session_state.annee_max - st.session_state.annee_min
 
-df["lambda"] = df["nb_evt"] / T
-df["proba_occ"] = 1. - np.exp(-df["lambda"])
-df["T_retour"] = 1. / df["lambda"]
-df["sigma"] = np.sqrt(df["nb_evt"]) / T
+df["Début"] = st.session_state.annee_min
+df["Fin"] = st.session_state.annee_max
+df["Période"] = T
+df["Lambda"] = df["Nombre d'événements"] / T
+df["Probabilité d'occurence"] = 1. - np.exp(-df["Lambda"])
+df["Période de retour"] = 1. / df["Lambda"]
+df["Sigma"] = np.sqrt(df["Nombre d'événements"]) / T
 
 alpha = 0.05
 
-df["IC_inf"] = chi2.ppf(alpha / 2., 2. * df["nb_evt"]) / (2. * T)
-df["IC_sup"] = chi2.ppf(1. - alpha / 2., 2. * (df["nb_evt"] + 1)) / (2. * T)
+df["IC inférieur"] = chi2.ppf(alpha / 2., 2. * df["Nombre d'événements"]) / (2. * T)
+df["IC supérieur"] = chi2.ppf(1. - alpha / 2., 2. * (df["Nombre d'événements"] + 1)) / (2. * T)
 
-df["fiabilite"] = np.select(
+df["Fiabilité"] = np.select(
     [
-        df["nb_evt"] < 3,
-        df["nb_evt"].between(3, 10, inclusive="both"),
-        df["nb_evt"] > 10
+        df["Nombre d'événements"] < 3,
+        df["Nombre d'événements"].between(3, 10, inclusive="both"),
+        df["Nombre d'événements"] > 10
     ],
     [1, 2, 3]
 )
 
-fiabilite_table = df["fiabilite"].map({ 1: "faible", 2: "moyenne", 3: "élevée"})
+st.dataframe(df, hide_index=True)
 
-st.write(df)
-
-st.table(fiabilite_table.value_counts())
+st.write(f"{len(df)} entrées.")
 
 with st.expander("Avertissement – Clause de non-responsabilité"):
     st.markdown(
