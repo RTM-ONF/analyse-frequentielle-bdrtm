@@ -3,10 +3,6 @@ import pandas as pd
 from scipy.stats import chi2
 import streamlit as st
 
-def convert_for_download(d):
-    csv = pd.DataFrame(d).to_csv(index=False, sep=";")
-    return csv.encode("utf-8-sig")
-
 st.title("Analyse fréquentielle de la BDRTM")
 
 st.header("Données")
@@ -93,12 +89,6 @@ fiabilite_table = df["fiabilite"].map({ 1: "faible", 2: "moyenne", 3: "élevée"
 st.write(df)
 
 st.table(fiabilite_table.value_counts())
-
-csv = convert_for_download(df)
-st.download_button(label="Télécharger l'analyse fréquentielle dans un fichier .csv",
-                    data=csv,
-                    file_name="analyse_frequentielle_bdrtm.csv"
-                    )
 
 with st.expander("Avertissement – Clause de non-responsabilité"):
     st.markdown(
