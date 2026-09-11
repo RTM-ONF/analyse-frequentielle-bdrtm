@@ -6,8 +6,11 @@ min_year = 1000
 
 max_year = 2026
 
-versions = [
-    "avril 2026"
+echelles = [
+    "Département",
+    "EPCI",
+    "Commune",
+    "Site"
 ]
 
 departements = [
@@ -27,7 +30,9 @@ departements = [
 
 phenomenes = [
     "A (Avalanches)",
+    "E (Ravinement/Ruissellement)",
     "G (Glissements de terrain)",
+    "I (Inondations)",
     "P (Chutes de bloc)",
     "T (Crues torrentielles)"
     ]
@@ -35,7 +40,7 @@ phenomenes = [
 
 @st.cache_data
 def load_data():
-    return pd.read_feather(f"data/{st.session_state.version.replace(" ", "_")}.feather")
+    return pd.read_feather("data/2026_08_17.feather")
 
 st.set_page_config(
     page_title="Analyse fréquentielle de la BDRTM",
@@ -44,11 +49,10 @@ st.set_page_config(
 
 # Widgets communs dans la sidebar
 with st.sidebar:
-    st.header("Extraction de la BDRTM")
+    st.header("Echelle d'analyse")
 
-    st.session_state.version = st.selectbox("Version",
-                                            versions,
-                                            index=0
+    st.session_state.echelle = st.selectbox("Echelle",
+                                            echelles,
                                     )
 
     st.header("Filtres")
@@ -57,7 +61,7 @@ with st.sidebar:
                                                     departements,
                                     )
 
-    st.session_state.annee_min, st.session_state.anne_max = st.slider("Période",
+    st.session_state.annee_min, st.session_state.annee_max = st.slider("Période",
                                                                       min_value=min_year,
                                                                       max_value=max_year,
                                                                       value=(min_year, max_year)
@@ -70,10 +74,7 @@ with st.sidebar:
 
 # Définition des pages
 pg = st.navigation([
-    st.Page("pages/01_accueil.py", title="Accueil"),
-    st.Page("pages/02_analyse_departement.py", title="Analyse à l'échelle du département"),
-    st.Page("pages/03_analyse_site.py", title="Analyse à l'échelle du site"),
-    st.Page("pages/04_analyse_commune.py", title="Analyse à l'échelle de la commune"),
+    st.Page("pages/01_accueil.py", title="Accueil")
 ])
 
 st.session_state.df = load_data()
