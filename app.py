@@ -62,15 +62,17 @@ with st.sidebar:
     with col2:
         st.image("./images/onf.png")
 
+    st.divider()
+
     st.page_link(pages[0], label="Accueil")
     st.page_link(pages[1], label="Analyse fréquentielle locale")
     st.page_link(pages[2], label="Analyse fréquentielle globale")
 
     st.divider()
 
-    st.header("Echelle d'analyse")
+    # st.header("Echelle d'analyse")
 
-    st.session_state.echelle = st.selectbox("Echelle",
+    st.session_state.echelle = st.selectbox("Echelle d'analyse",
                                             echelles,
                                     )
 
@@ -100,16 +102,16 @@ with st.sidebar:
                                                  phenomenes,
                                     )
 
-    st.markdown(
-        """
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="www.onf.fr" target="_blank">
-                www.onf.fr
-            </a>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # st.markdown(
+    #     """
+    #     <div style="text-align: center; margin-top: 20px;">
+    #         <a href="www.onf.fr" target="_blank">
+    #             www.onf.fr
+    #         </a>
+    #     </div>
+    #     """,
+    #     unsafe_allow_html=True
+    # )
 
 st.session_state.df = load_data()
 
