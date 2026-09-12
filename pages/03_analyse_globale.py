@@ -182,7 +182,7 @@ fig = px.pie(
     df,
     names="Phénomène",
     values="Nombre d'événements",
-    title="Répartition globale des phénomènes",
+    title="Répartition globale des événements observés selon les phénomènes",
     color="Phénomène",
     color_discrete_sequence=px.colors.qualitative.Pastel
 )

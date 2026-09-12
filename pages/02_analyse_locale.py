@@ -157,7 +157,7 @@ fig = px.bar(
 fig.update_xaxes(type="category")
 
 fig.update_layout(
-    title="Répartition locale des phénomènes",
+    title="Répartition locale des événements observés selon les phénomènes",
     xaxis_title=f"{st.session_state.echelle}",
     yaxis_title="Nombre d'événements"
 )
