@@ -165,12 +165,12 @@ df["Indicateur qualitatif de fiabilité"] = df["Indicateur qualitatif de fiabili
 st.dataframe(df, hide_index=True)
 
 mapping ={
-    "A": "Avalanche",
-    "E": "Ravinement/Ruissellement",
-    "G": "Mouvement de terrain",
-    "I": "Inondation",
-    "P": "Chute de bloc",
-    "T": "Crue torrentielle"
+    "A": "Avalanche (A)",
+    "E": "Ravinement/Ruissellement (E)",
+    "G": "Mouvement de terrain (G)",
+    "I": "Inondation (I)",
+    "P": "Chute de bloc (P)",
+    "T": "Crue torrentielle (T)"
 }
 
 df = df[df["Phénomène"].isin(["A", "E", "G", "I", "P", "T"])]
