@@ -26,14 +26,29 @@ if st.session_state.echelle == "Département":
 if st.session_state.echelle == "EPCI":
     df["EPCI"] = df["EPCI"].str.split(",")
     df = df.explode("EPCI")
+    if st.session_state.selection != "":
+        selection = st.session_state.selection.split(",")
+        selection = [epci.strip() for epci in selection]
+        df = df[df["EPCI"].isin(selection)]
+
     df = df[["Département", "Année", "EPCI", "Phénomène"]]
 
 if st.session_state.echelle == "Commune":
     df["Commune"] = df["Commune"].str.split(";")
     df = df.explode("Commune")
+    if st.session_state.selection != "":
+        selection = st.session_state.selection.split(",")
+        selection = [commune.strip() for commune in selection]
+        df = df[df["Commune"].isin(selection)]
+
     df = df[["Département", "Année", "Commune", "Phénomène"]]
 
 if st.session_state.echelle == "Site":
+    if st.session_state.selection != "":
+        selection = st.session_state.selection.split(",")
+        selection = [site.strip() for site in selection]
+        df = df[df["Site"].isin(selection)]
+
     df = df[["Département", "Année", "Site", "Phénomène"]]
 
 st.dataframe(df, hide_index=True)
@@ -41,6 +56,8 @@ st.dataframe(df, hide_index=True)
 st.write(f"{len(df)} événements.")
 
 st.header("Analyse fréquentielle")
+
+st.subheader("Analyse locale par phénomène")
 
 if st.session_state.phenomenes == []:
     all_pheno = "_".join(["A", "E", "G", "I", "P", "T"])
@@ -81,10 +98,50 @@ df["Fiabilité"] = np.select(
     ],
     [1, 2, 3]
 )
+df["Fiabilité"] = df["Fiabilité"].map({
+    1: "Faible",
+    2: "Moyenne",
+    3: "Élevée"
+})
 
 st.dataframe(df, hide_index=True)
 
 st.write(f"{len(df)} entrées.")
+
+st.subheader("Analyse globale par phénomène")
+
+df = (
+    df.groupby("Phénomène")["Nombre d'événements"]
+      .sum()
+      .reset_index()
+)
+
+df["Début"] = st.session_state.annee_min
+df["Fin"] = st.session_state.annee_max
+df["Période"] = T
+df["Lambda"] = df["Nombre d'événements"] / T
+df["Probabilité d'occurence"] = 1. - np.exp(-df["Lambda"])
+df["Période de retour"] = 1. / df["Lambda"]
+df["Sigma"] = np.sqrt(df["Nombre d'événements"]) / T
+df["IC inférieur"] = chi2.ppf(alpha / 2., 2. * df["Nombre d'événements"]) / (2. * T)
+df["IC supérieur"] = chi2.ppf(1. - alpha / 2., 2. * (df["Nombre d'événements"] + 1)) / (2. * T)
+df["Fiabilité"] = np.select(
+    [
+        df["Nombre d'événements"] < 3,
+        df["Nombre d'événements"].between(3, 10, inclusive="both"),
+        df["Nombre d'événements"] > 10
+    ],
+    [1, 2, 3]
+)
+df["Fiabilité"] = df["Fiabilité"].map({
+    1: "Faible",
+    2: "Moyenne",
+    3: "Élevée"
+})
+
+st.dataframe(df, hide_index=True)
+
+st.write(f"{len(df)} phénomènes.")
 
 with st.expander("Avertissement – Clause de non-responsabilité"):
     st.markdown(

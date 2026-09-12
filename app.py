@@ -55,9 +55,15 @@ with st.sidebar:
                                             echelles,
                                     )
 
-    # st.session_state.liste = st.text_input("Sélection")
-
-    # st.session_state.regrouper = st.checkbox("Regrouper la sélection")
+    if st.session_state.echelle != "Département":
+        st.session_state.selection = st.text_input(
+            "Sélection",
+            help="""
+            Indiquer les valeurs à sélectionner. Utiliser la virgule comme séparateur.\n
+            Par exemple, avec une échelle d'analyse communale :\n
+                Grenoble, Gières, La Tronche, Claix
+            """
+            )
 
     st.header("Filtres")
 
