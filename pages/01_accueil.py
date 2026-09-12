@@ -82,12 +82,12 @@ st.write(f"{len(df)} événements.")
 df = df.groupby(["Année", "Phénomène"]).size().reset_index(name="Nombre d'événements")
 
 mapping ={
-    "A": "Avalanche",
-    "E": "Ravinement/Ruissellement",
-    "G": "Mouvement de terrain",
-    "I": "Inondation",
-    "P": "Chute de bloc",
-    "T": "Crue torrentielle"
+    "A": "Avalanche (A)",
+    "E": "Ravinement/Ruissellement (E)",
+    "G": "Mouvement de terrain (G)",
+    "I": "Inondation (I)",
+    "P": "Chute de bloc (P)",
+    "T": "Crue torrentielle (T)"
 }
 
 df["Phénomène"] = df["Phénomène"].map(mapping)
