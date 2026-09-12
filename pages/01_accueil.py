@@ -8,6 +8,12 @@ st.title("Analyse fréquentielle de la BDRTM")
 
 st.header("Données")
 
+st.markdown(
+    """
+    Extraction du 17 août 2026
+    """
+)
+
 df = st.session_state.df
 
 if st.session_state.departements != []:
@@ -79,18 +85,18 @@ T = st.session_state.annee_max - st.session_state.annee_min
 
 df["Début"] = st.session_state.annee_min
 df["Fin"] = st.session_state.annee_max
-df["Période"] = T
-df["Lambda"] = df["Nombre d'événements"] / T
-df["Probabilité d'occurence"] = 1. - np.exp(-df["Lambda"])
-df["Période de retour"] = 1. / df["Lambda"]
-df["Sigma"] = np.sqrt(df["Nombre d'événements"]) / T
+df["Durée"] = T
+df["Fréquence moyenne annuelle"] = df["Nombre d'événements"] / T
+df["Probabilité d'occurrence annuelle"] = 1. - np.exp(-df["Fréquence moyenne annuelle"])
+df["Période de retour"] = 1. / df["Fréquence moyenne annuelle"]
+df["Ecart type"] = np.sqrt(df["Nombre d'événements"]) / T
 
 alpha = 0.05
 
-df["IC inférieur"] = chi2.ppf(alpha / 2., 2. * df["Nombre d'événements"]) / (2. * T)
-df["IC supérieur"] = chi2.ppf(1. - alpha / 2., 2. * (df["Nombre d'événements"] + 1)) / (2. * T)
+df["Intervalle de confiance à 95% inférieur"] = chi2.ppf(alpha / 2., 2. * df["Nombre d'événements"]) / (2. * T)
+df["Intervalle de confiance à 95% supérieur"] = chi2.ppf(1. - alpha / 2., 2. * (df["Nombre d'événements"] + 1)) / (2. * T)
 
-df["Fiabilité"] = np.select(
+df["Indicateur qualitatif de fiabilité"] = np.select(
     [
         df["Nombre d'événements"] < 3,
         df["Nombre d'événements"].between(3, 10, inclusive="both"),
@@ -98,7 +104,7 @@ df["Fiabilité"] = np.select(
     ],
     [1, 2, 3]
 )
-df["Fiabilité"] = df["Fiabilité"].map({
+df["Indicateur qualitatif de fiabilité"] = df["Indicateur qualitatif de fiabilité"].map({
     1: "Faible",
     2: "Moyenne",
     3: "Élevée"
@@ -118,14 +124,18 @@ df = (
 
 df["Début"] = st.session_state.annee_min
 df["Fin"] = st.session_state.annee_max
-df["Période"] = T
-df["Lambda"] = df["Nombre d'événements"] / T
-df["Probabilité d'occurence"] = 1. - np.exp(-df["Lambda"])
-df["Période de retour"] = 1. / df["Lambda"]
-df["Sigma"] = np.sqrt(df["Nombre d'événements"]) / T
-df["IC inférieur"] = chi2.ppf(alpha / 2., 2. * df["Nombre d'événements"]) / (2. * T)
-df["IC supérieur"] = chi2.ppf(1. - alpha / 2., 2. * (df["Nombre d'événements"] + 1)) / (2. * T)
-df["Fiabilité"] = np.select(
+df["Durée"] = T
+df["Fréquence moyenne annuelle"] = df["Nombre d'événements"] / T
+df["Probabilité d'occurrence annuelle"] = 1. - np.exp(-df["Fréquence moyenne annuelle"])
+df["Période de retour"] = 1. / df["Fréquence moyenne annuelle"]
+df["Ecart type"] = np.sqrt(df["Nombre d'événements"]) / T
+
+alpha = 0.05
+
+df["Intervalle de confiance à 95% inférieur"] = chi2.ppf(alpha / 2., 2. * df["Nombre d'événements"]) / (2. * T)
+df["Intervalle de confiance à 95% supérieur"] = chi2.ppf(1. - alpha / 2., 2. * (df["Nombre d'événements"] + 1)) / (2. * T)
+
+df["Indicateur qualitatif de fiabilité"] = np.select(
     [
         df["Nombre d'événements"] < 3,
         df["Nombre d'événements"].between(3, 10, inclusive="both"),
@@ -133,7 +143,7 @@ df["Fiabilité"] = np.select(
     ],
     [1, 2, 3]
 )
-df["Fiabilité"] = df["Fiabilité"].map({
+df["Indicateur qualitatif de fiabilité"] = df["Indicateur qualitatif de fiabilité"].map({
     1: "Faible",
     2: "Moyenne",
     3: "Élevée"
@@ -142,6 +152,40 @@ df["Fiabilité"] = df["Fiabilité"].map({
 st.dataframe(df, hide_index=True)
 
 st.write(f"{len(df)} phénomènes.")
+
+with st.expander("Détails des indicateurs statistiques"):
+    st.markdown(
+        """
+        #### Durée d'observation
+        $$T$$
+
+        #### Nombre d'observations
+        $$N$$
+
+        #### Fréquence moyenne annuelle
+        $$\\lambda = \\frac{N}{T}$$
+
+        #### Probabilité d'occurrence annuelle
+        $$P = 1 - e^{-\\lambda}$$
+
+        #### Période de retour
+        $$T_r = \\frac{1}{\\lambda}$$
+
+        #### Ecart type
+        $$\\sigma = \\frac{\\sqrt{N}}{T}$$
+
+        #### Intervalle de confiance à 95% inférieur
+        $$IC_{inf} = \\frac{1}{2T} \\chi^2_{\\left[\\frac{\\alpha}{2}, 2N\\right]}$$
+
+        #### Intervalle de confiance à 95% supérieur
+        $$IC_{sup} = \\frac{1}{2T} \\chi^2_{\\left[1-\\frac{\\alpha}{2}, 2N+1\\right]}$$
+
+        #### Indicateur qualitatif de fiabilité
+        - fiabilité faible : moins de 3 événements
+        - fiabilité moyenne : entre 3 et 9 événements
+        - fiabilité élevée : 10 événements ou plus
+        """
+    )
 
 with st.expander("Avertissement – Clause de non-responsabilité"):
     st.markdown(
