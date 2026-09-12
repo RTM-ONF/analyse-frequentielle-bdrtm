@@ -60,7 +60,7 @@ with st.sidebar:
             "Sélection",
             help="""
             Indiquer les valeurs à sélectionner. Utiliser la virgule comme séparateur.\n
-            Par exemple, avec une échelle d'analyse communale :\n
+            Exemple avec une échelle d'analyse communale :\n
                 Grenoble, Gières, La Tronche, Claix
             """
             )
