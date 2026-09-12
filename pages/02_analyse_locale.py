@@ -154,6 +154,8 @@ fig = px.bar(
     color_discrete_sequence=px.colors.qualitative.Pastel
 )
 
+fig.update_xaxes(type="category")
+
 fig.update_layout(
     title="Répartition locale des phénomènes",
     xaxis_title=f"{st.session_state.echelle}",
