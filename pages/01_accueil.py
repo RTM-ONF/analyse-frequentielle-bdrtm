@@ -1,16 +1,34 @@
 import numpy as np
 import pandas as pd
+import plotly.express as px
 from scipy.stats import chi2
 import streamlit as st
 
 
 st.title("Analyse fréquentielle de la BDRTM")
 
+with st.expander("Avertissement – Clause de non-responsabilité"):
+    st.markdown(
+        """
+        Cette application est fournie à titre informatif et pédagogique. Les calculs, estimations et résultats produits par ce logiciel sont basés sur des modèles, hypothèses et données qui peuvent comporter des approximations ou des simplifications.
+
+        Malgré le soin apporté à son développement et à sa validation, aucune garantie n’est donnée quant à l’exactitude, l’exhaustivité ou l’actualité des informations et résultats fournis.
+
+        En conséquence, les auteurs, développeurs et distributeurs de cette application ne sauraient être tenus responsables des erreurs, omissions ou des conséquences directes ou indirectes résultant de l’utilisation des informations, résultats ou recommandations fournis par ce logiciel.
+
+        L’utilisateur demeure seul responsable de l’interprétation des résultats et de l’usage qu’il en fait. Il lui appartient notamment de vérifier la pertinence des hypothèses, des paramètres d’entrée et des résultats obtenus au regard de son contexte d’utilisation.
+
+        Cette application ne se substitue en aucun cas à une expertise technique, scientifique ou professionnelle. Toute décision fondée sur les résultats fournis par ce logiciel relève de la seule responsabilité de l’utilisateur.
+
+        L’utilisation de cette application implique l’acceptation pleine et entière des présentes conditions.
+        """
+    )
+
 st.header("Données")
 
 st.markdown(
     """
-    Extraction du 17 août 2026
+    Les données utilisées dans cette application sont issues d'une extraction de la BDRTM en date du **17 août 2026**.
     """
 )
 
@@ -61,145 +79,123 @@ st.dataframe(df, hide_index=True)
 
 st.write(f"{len(df)} événements.")
 
-st.header("Analyse fréquentielle")
+df = df.groupby(["Année", "Phénomène"]).size().reset_index(name="Nombre d'événements")
 
-st.subheader("Analyse locale par phénomène")
+mapping ={
+    "A": "Avalanche",
+    "E": "Ravinement/Ruissellement",
+    "G": "Mouvement de terrain",
+    "I": "Inondation",
+    "P": "Chute de bloc",
+    "T": "Crue torrentielle"
+}
 
-if st.session_state.phenomenes == []:
-    all_pheno = "_".join(["A", "E", "G", "I", "P", "T"])
-elif len(st.session_state.phenomenes) > 1:
-    all_pheno = "_".join([phenomene[0] for phenomene in st.session_state.phenomenes])
+df["Phénomène"] = df["Phénomène"].map(mapping)
 
-table_1 = df.groupby([st.session_state.echelle, "Phénomène"]).size().reset_index(name="Nombre d'événements")
-
-if len(st.session_state.phenomenes) > 1 or st.session_state.phenomenes == []:
-    table_2 = df.groupby(st.session_state.echelle).size().reset_index(name="Nombre d'événements")
-    table_2["Phénomène"] = all_pheno
-    df = pd.concat([table_1, table_2])
-    df.reset_index(drop=True)
-else:
-    df = table_1
-    df.reset_index(drop=True)
-
-T = st.session_state.annee_max - st.session_state.annee_min
-
-df["Début"] = st.session_state.annee_min
-df["Fin"] = st.session_state.annee_max
-df["Durée"] = T
-df["Fréquence moyenne annuelle"] = df["Nombre d'événements"] / T
-df["Probabilité d'occurrence annuelle"] = 1. - np.exp(-df["Fréquence moyenne annuelle"])
-df["Période de retour"] = 1. / df["Fréquence moyenne annuelle"]
-df["Ecart type"] = np.sqrt(df["Nombre d'événements"]) / T
-
-alpha = 0.05
-
-df["Intervalle de confiance à 95% inférieur"] = chi2.ppf(alpha / 2., 2. * df["Nombre d'événements"]) / (2. * T)
-df["Intervalle de confiance à 95% supérieur"] = chi2.ppf(1. - alpha / 2., 2. * (df["Nombre d'événements"] + 1)) / (2. * T)
-
-df["Indicateur qualitatif de fiabilité"] = np.select(
-    [
-        df["Nombre d'événements"] < 3,
-        df["Nombre d'événements"].between(3, 10, inclusive="both"),
-        df["Nombre d'événements"] > 10
-    ],
-    [1, 2, 3]
-)
-df["Indicateur qualitatif de fiabilité"] = df["Indicateur qualitatif de fiabilité"].map({
-    1: "Faible",
-    2: "Moyenne",
-    3: "Élevée"
-})
-
-st.dataframe(df, hide_index=True)
-
-st.write(f"{len(df)} entrées.")
-
-st.subheader("Analyse globale par phénomène")
-
-df = (
-    df.groupby("Phénomène")["Nombre d'événements"]
-      .sum()
-      .reset_index()
+fig = px.bar(
+    df,
+    x="Année",
+    y="Nombre d'événements",
+    color="Phénomène",
+    barmode="stack",
+    color_discrete_sequence=px.colors.qualitative.Pastel
 )
 
-df["Début"] = st.session_state.annee_min
-df["Fin"] = st.session_state.annee_max
-df["Durée"] = T
-df["Fréquence moyenne annuelle"] = df["Nombre d'événements"] / T
-df["Probabilité d'occurrence annuelle"] = 1. - np.exp(-df["Fréquence moyenne annuelle"])
-df["Période de retour"] = 1. / df["Fréquence moyenne annuelle"]
-df["Ecart type"] = np.sqrt(df["Nombre d'événements"]) / T
-
-alpha = 0.05
-
-df["Intervalle de confiance à 95% inférieur"] = chi2.ppf(alpha / 2., 2. * df["Nombre d'événements"]) / (2. * T)
-df["Intervalle de confiance à 95% supérieur"] = chi2.ppf(1. - alpha / 2., 2. * (df["Nombre d'événements"] + 1)) / (2. * T)
-
-df["Indicateur qualitatif de fiabilité"] = np.select(
-    [
-        df["Nombre d'événements"] < 3,
-        df["Nombre d'événements"].between(3, 10, inclusive="both"),
-        df["Nombre d'événements"] > 10
-    ],
-    [1, 2, 3]
+fig.update_layout(
+    title="Evolution du nombre d'événements observés au cours du temps",
+    xaxis_title="Année",
+    yaxis_title="Nombre d'événements"
 )
-df["Indicateur qualitatif de fiabilité"] = df["Indicateur qualitatif de fiabilité"].map({
-    1: "Faible",
-    2: "Moyenne",
-    3: "Élevée"
-})
+st.plotly_chart(fig, use_container_width=True)
 
-st.dataframe(df, hide_index=True)
+# st.header("Analyse fréquentielle")
 
-st.write(f"{len(df)} phénomènes.")
+# st.subheader("Analyse locale par phénomène")
 
-with st.expander("Détails des indicateurs statistiques"):
-    st.markdown(
-        """
-        #### Durée d'observation
-        $$T$$
+# if st.session_state.phenomenes == []:
+#     all_pheno = "_".join(["A", "E", "G", "I", "P", "T"])
+# elif len(st.session_state.phenomenes) > 1:
+#     all_pheno = "_".join([phenomene[0] for phenomene in st.session_state.phenomenes])
 
-        #### Nombre d'observations
-        $$N$$
+# table_1 = df.groupby([st.session_state.echelle, "Phénomène"]).size().reset_index(name="Nombre d'événements")
 
-        #### Fréquence moyenne annuelle
-        $$\\lambda = \\frac{N}{T}$$
+# if len(st.session_state.phenomenes) > 1 or st.session_state.phenomenes == []:
+#     table_2 = df.groupby(st.session_state.echelle).size().reset_index(name="Nombre d'événements")
+#     table_2["Phénomène"] = all_pheno
+#     df = pd.concat([table_1, table_2])
+#     df.reset_index(drop=True)
+# else:
+#     df = table_1
+#     df.reset_index(drop=True)
 
-        #### Probabilité d'occurrence annuelle
-        $$P = 1 - e^{-\\lambda}$$
+# T = st.session_state.annee_max - st.session_state.annee_min
 
-        #### Période de retour
-        $$T_r = \\frac{1}{\\lambda}$$
+# df["Début"] = st.session_state.annee_min
+# df["Fin"] = st.session_state.annee_max
+# df["Durée"] = T
+# df["Fréquence moyenne annuelle"] = df["Nombre d'événements"] / T
+# df["Probabilité d'occurrence annuelle"] = 1. - np.exp(-df["Fréquence moyenne annuelle"])
+# df["Période de retour"] = 1. / df["Fréquence moyenne annuelle"]
+# df["Ecart type"] = np.sqrt(df["Nombre d'événements"]) / T
 
-        #### Ecart type
-        $$\\sigma = \\frac{\\sqrt{N}}{T}$$
+# alpha = 0.05
 
-        #### Intervalle de confiance à 95% inférieur
-        $$IC_{inf} = \\frac{1}{2T} \\chi^2_{\\left[\\frac{\\alpha}{2}, 2N\\right]}$$
+# df["Intervalle de confiance à 95% inférieur"] = chi2.ppf(alpha / 2., 2. * df["Nombre d'événements"]) / (2. * T)
+# df["Intervalle de confiance à 95% supérieur"] = chi2.ppf(1. - alpha / 2., 2. * (df["Nombre d'événements"] + 1)) / (2. * T)
 
-        #### Intervalle de confiance à 95% supérieur
-        $$IC_{sup} = \\frac{1}{2T} \\chi^2_{\\left[1-\\frac{\\alpha}{2}, 2N+1\\right]}$$
+# df["Indicateur qualitatif de fiabilité"] = np.select(
+#     [
+#         df["Nombre d'événements"] < 3,
+#         df["Nombre d'événements"].between(3, 10, inclusive="both"),
+#         df["Nombre d'événements"] > 10
+#     ],
+#     [1, 2, 3]
+# )
+# df["Indicateur qualitatif de fiabilité"] = df["Indicateur qualitatif de fiabilité"].map({
+#     1: "Faible",
+#     2: "Moyenne",
+#     3: "Élevée"
+# })
 
-        #### Indicateur qualitatif de fiabilité
-        - fiabilité faible : moins de 3 événements
-        - fiabilité moyenne : entre 3 et 9 événements
-        - fiabilité élevée : 10 événements ou plus
-        """
-    )
+# st.dataframe(df, hide_index=True)
 
-with st.expander("Avertissement – Clause de non-responsabilité"):
-    st.markdown(
-        """
-        Cette application est fournie à titre informatif et pédagogique. Les calculs, estimations et résultats produits par ce logiciel sont basés sur des modèles, hypothèses et données qui peuvent comporter des approximations ou des simplifications.
+# st.write(f"{len(df)} entrées.")
 
-        Malgré le soin apporté à son développement et à sa validation, aucune garantie n’est donnée quant à l’exactitude, l’exhaustivité ou l’actualité des informations et résultats fournis.
+# st.subheader("Analyse globale par phénomène")
 
-        En conséquence, les auteurs, développeurs et distributeurs de cette application ne sauraient être tenus responsables des erreurs, omissions ou des conséquences directes ou indirectes résultant de l’utilisation des informations, résultats ou recommandations fournis par ce logiciel.
+# df = (
+#     df.groupby("Phénomène")["Nombre d'événements"]
+#       .sum()
+#       .reset_index()
+# )
 
-        L’utilisateur demeure seul responsable de l’interprétation des résultats et de l’usage qu’il en fait. Il lui appartient notamment de vérifier la pertinence des hypothèses, des paramètres d’entrée et des résultats obtenus au regard de son contexte d’utilisation.
+# df["Début"] = st.session_state.annee_min
+# df["Fin"] = st.session_state.annee_max
+# df["Durée"] = T
+# df["Fréquence moyenne annuelle"] = df["Nombre d'événements"] / T
+# df["Probabilité d'occurrence annuelle"] = 1. - np.exp(-df["Fréquence moyenne annuelle"])
+# df["Période de retour"] = 1. / df["Fréquence moyenne annuelle"]
+# df["Ecart type"] = np.sqrt(df["Nombre d'événements"]) / T
 
-        Cette application ne se substitue en aucun cas à une expertise technique, scientifique ou professionnelle. Toute décision fondée sur les résultats fournis par ce logiciel relève de la seule responsabilité de l’utilisateur.
+# alpha = 0.05
 
-        L’utilisation de cette application implique l’acceptation pleine et entière des présentes conditions.
-        """
-    )
+# df["Intervalle de confiance à 95% inférieur"] = chi2.ppf(alpha / 2., 2. * df["Nombre d'événements"]) / (2. * T)
+# df["Intervalle de confiance à 95% supérieur"] = chi2.ppf(1. - alpha / 2., 2. * (df["Nombre d'événements"] + 1)) / (2. * T)
+
+# df["Indicateur qualitatif de fiabilité"] = np.select(
+#     [
+#         df["Nombre d'événements"] < 3,
+#         df["Nombre d'événements"].between(3, 10, inclusive="both"),
+#         df["Nombre d'événements"] > 10
+#     ],
+#     [1, 2, 3]
+# )
+# df["Indicateur qualitatif de fiabilité"] = df["Indicateur qualitatif de fiabilité"].map({
+#     1: "Faible",
+#     2: "Moyenne",
+#     3: "Élevée"
+# })
+
+# st.dataframe(df, hide_index=True)
+
+# st.write(f"{len(df)} phénomènes.")

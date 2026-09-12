@@ -29,12 +29,12 @@ departements = [
     ]
 
 phenomenes = [
-    "A (Avalanches)",
+    "A (Avalanche)",
     "E (Ravinement/Ruissellement)",
-    "G (Glissements de terrain)",
-    "I (Inondations)",
-    "P (Chutes de bloc)",
-    "T (Crues torrentielles)"
+    "G (Glissement de terrain)",
+    "I (Inondation)",
+    "P (Chute de bloc)",
+    "T (Crue torrentielle)"
     ]
 ####################################
 
@@ -47,12 +47,26 @@ st.set_page_config(
     layout="wide"
 )
 
+pages = [
+    st.Page("pages/01_accueil.py", title="Accueil"),
+    st.Page("pages/02_analyse_locale.py", title="Analyse fréquentielle locale"),
+    st.Page("pages/03_analyse_globale.py", title="Analyse fréquentielle globale"),
+]
+
+pg = st.navigation(pages, position="hidden")
+
 # Widgets communs dans la sidebar
 with st.sidebar:
     col1, col2, col3 = st.columns([1, 5, 1])
 
     with col2:
         st.image("./images/onf.png")
+
+    st.page_link(pages[0], label="Accueil")
+    st.page_link(pages[1], label="Analyse fréquentielle locale")
+    st.page_link(pages[2], label="Analyse fréquentielle globale")
+
+    st.divider()
 
     st.header("Echelle d'analyse")
 
@@ -86,11 +100,16 @@ with st.sidebar:
                                                  phenomenes,
                                     )
 
-
-# Définition des pages
-pg = st.navigation([
-    st.Page("pages/01_accueil.py", title="Accueil")
-])
+    st.markdown(
+        """
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="www.onf.fr" target="_blank">
+                www.onf.fr
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 st.session_state.df = load_data()
 
