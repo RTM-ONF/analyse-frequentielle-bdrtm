@@ -184,7 +184,7 @@ fig = px.pie(
     values="Nombre d'événements",
     title="Répartition globale des événements observés selon les phénomènes",
     color="Phénomène",
-    color_discrete_sequence=px.colors.qualitative.Pastel
+    color_discrete_sequence=px.colors.qualitative.Pastel,
 )
 
 fig.update_traces(
