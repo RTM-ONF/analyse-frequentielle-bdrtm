@@ -193,14 +193,11 @@ fig = px.pie(
     names="Phénomène",
     values="Nombre d'événements",
     color="Phénomène",
-    color_discrete_map=color_map,
+    color_discrete_map=color_map
 )
 
 fig.update_traces(
-    textinfo="percent+label",
-    marker=dict(
-        line=dict(width=1)
-    ),
+    textinfo="percent+label"
 )
 
 fig.update_layout(
