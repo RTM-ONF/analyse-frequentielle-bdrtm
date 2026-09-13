@@ -178,21 +178,28 @@ df["Phénomène"] = df["Phénomène"].map(mapping)
 
 st.write(f"{len(df)} phénomènes observés.")
 
+color_map = {
+    "Avalanche (A)" : "#66C5CC",
+    "Ravinement/Ruissellement (E)" : "#F6CF71",
+    "Mouvement de terrain (G)" : "#F89C74",
+    "Inondation (I)": "#DCB0F2",
+    "Chute de bloc (P)": "#87C55F",
+    "Crue torrentielle (T)": "#9EB9F3"
+}
+
 fig = px.pie(
     df,
+    title="Répartition globale du nombre d'événements observés",
     names="Phénomène",
     values="Nombre d'événements",
-    title="Répartition globale des événements observés selon les phénomènes",
     color="Phénomène",
-    color_discrete_sequence=px.colors.qualitative.Pastel,
+    color_discrete_map=color_map,
 )
 
 fig.update_traces(
     textinfo="percent+label",
     marker=dict(
-        line=dict(
-            width=1
-        )
+        line=dict(width=1)
     ),
 )
 
@@ -200,6 +207,37 @@ fig.update_layout(
     legend=dict(
         title="Phénomène",
     ),
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+#######################################################
+df["erreur_sup"] = (
+    df["Intervalle de confiance à 95% supérieur"]
+    - df["Fréquence moyenne annuelle"]
+)
+
+df["erreur_inf"] = (
+    df["Fréquence moyenne annuelle"]
+    - df["Intervalle de confiance à 95% inférieur"]
+)
+
+fig = px.bar(
+    df,
+    title="Répartition globale de la fréquence moyenne annuelle",
+    x="Phénomène",
+    y="Fréquence moyenne annuelle",
+    color="Phénomène",
+    color_discrete_map=color_map,
+)
+
+fig.update_traces(
+    error_y=dict(
+        type="data",
+        symmetric=False,
+        array=df["erreur_sup"],
+        arrayminus=df["erreur_inf"]
+    )
 )
 
 st.plotly_chart(fig, use_container_width=True)

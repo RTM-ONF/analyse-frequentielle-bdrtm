@@ -145,20 +145,110 @@ mapping ={
 df = df[df["Phénomène"].isin(["A", "E", "G", "I", "P", "T"])]
 df["Phénomène"] = df["Phénomène"].map(mapping)
 
+color_map = {
+    "Avalanche (A)" : "#66C5CC",
+    "Ravinement/Ruissellement (E)" : "#F6CF71",
+    "Mouvement de terrain (G)" : "#F89C74",
+    "Inondation (I)": "#DCB0F2",
+    "Chute de bloc (P)": "#87C55F",
+    "Crue torrentielle (T)": "#9EB9F3"
+}
+
+################################################
 fig = px.bar(
     df,
+    title="Répartition locale du nombre d'événements observés",
     x=st.session_state.echelle,
     y="Nombre d'événements",
     color="Phénomène",
     barmode="stack",
-    color_discrete_sequence=px.colors.qualitative.Pastel
+    color_discrete_map=color_map
 )
 
 fig.update_xaxes(type="category")
 
-fig.update_layout(
-    title="Répartition locale des événements observés selon les phénomènes",
-    xaxis_title=f"{st.session_state.echelle}",
-    yaxis_title="Nombre d'événements"
-)
 st.plotly_chart(fig, use_container_width=True)
+################################################
+
+df["err_plus"] = (
+    df["Intervalle de confiance à 95% supérieur"]
+    - df["Fréquence moyenne annuelle"]
+)
+
+df["err_minus"] = (
+    df["Fréquence moyenne annuelle"]
+    - df["Intervalle de confiance à 95% inférieur"]
+)
+
+fig = px.scatter(
+    df,
+    title="Répartition locale de la fréquence annuelle moyenne avec intervalle de confiance",
+    x=st.session_state.echelle,
+    y="Fréquence moyenne annuelle",
+    color="Phénomène",
+    error_y="err_plus",
+    error_y_minus="err_minus",
+    color_discrete_map=color_map
+)
+
+fig.update_xaxes(type="category")
+st.plotly_chart(fig, use_container_width=True)
+################################################
+pivot = df.pivot(
+    index=st.session_state.echelle,
+    columns="Phénomène",
+    values="Fréquence moyenne annuelle"
+)
+
+fig = px.imshow(
+    pivot,
+    title="Répartition locale de la fréquence annuelle moyenne",
+    aspect="auto",
+    color_continuous_scale="YlOrRd",
+    labels=dict(
+        x="Phénomène",
+        y=st.session_state.echelle,
+        color="Fréquence"
+    )
+)
+
+fig.update_yaxes(type="category")
+
+st.plotly_chart(fig, use_container_width=True)
+################################################
+pivot = df.pivot(
+    index=st.session_state.echelle,
+    columns="Phénomène",
+    values="Probabilité d'occurrence annuelle"
+)
+
+fig = px.imshow(
+    pivot,
+    title="Répartition locale de la probabilité d'occurrence annuelle",
+    aspect="auto",
+    color_continuous_scale="YlOrRd",
+    labels=dict(
+        x="Phénomène",
+        y=st.session_state.echelle,
+        color="Probabilité"
+    )
+)
+
+fig.update_yaxes(type="category")
+
+st.plotly_chart(fig, use_container_width=True)
+######################################################################
+
+fig = px.scatter(
+    df,
+    title="Répartition locale de la fréquence moyenne en fonction de la probabilités d'occurrence",
+    x="Probabilité d'occurrence annuelle",
+    y="Fréquence moyenne annuelle",
+    color="Phénomène",
+    size="Nombre d'événements",
+    hover_name=st.session_state.echelle,
+    color_discrete_map=color_map
+)
+
+st.plotly_chart(fig, use_container_width=True)
+##################################################
