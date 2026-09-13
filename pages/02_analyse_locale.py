@@ -167,7 +167,7 @@ fig = px.bar(
 
 fig.update_xaxes(type="category")
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 ################################################
 
 df["err_plus"] = (
@@ -192,7 +192,7 @@ fig = px.scatter(
 )
 
 fig.update_xaxes(type="category")
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 ################################################
 pivot = df.pivot(
     index=st.session_state.echelle,
@@ -214,7 +214,7 @@ fig = px.imshow(
 
 fig.update_yaxes(type="category")
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 ################################################
 pivot = df.pivot(
     index=st.session_state.echelle,
@@ -236,7 +236,7 @@ fig = px.imshow(
 
 fig.update_yaxes(type="category")
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 ######################################################################
 
 fig = px.scatter(
@@ -250,5 +250,5 @@ fig = px.scatter(
     color_discrete_map=color_map
 )
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 ##################################################
