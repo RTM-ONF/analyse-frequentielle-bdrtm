@@ -129,6 +129,9 @@ df["Indicateur qualitatif de fiabilité"] = df["Indicateur qualitatif de fiabili
     3: "Élevée"
 })
 
+if st.session_state.fiabilites != []:
+    df = df[df["Indicateur qualitatif de fiabilité"].isin(st.session_state.fiabilites)]
+
 st.dataframe(df, hide_index=True)
 
 st.write(f"{len(df)} entrées.")

@@ -36,6 +36,12 @@ phenomenes = [
     "P (Chute de bloc)",
     "T (Crue torrentielle)"
     ]
+
+fiabilites = [
+    "Élevée",
+    "Moyenne",
+    "Faible"
+]
 ####################################
 
 @st.cache_data
@@ -100,6 +106,10 @@ with st.sidebar:
 
     st.session_state.phenomenes = st.multiselect("Phénomènes",
                                                  phenomenes,
+                                    )
+
+    st.session_state.fiabilites = st.multiselect("Indicateurs qualitatifs de fiabilité",
+                                                 fiabilites,
                                     )
 
     # st.markdown(
