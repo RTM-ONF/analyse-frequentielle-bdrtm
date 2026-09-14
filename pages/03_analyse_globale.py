@@ -209,6 +209,15 @@ fig.update_layout(
     ),
 )
 
+fig.update_layout(
+    legend=dict(
+        title="",
+        orientation="h",
+        yanchor="bottom",
+        y=1.0
+    )
+)
+
 st.plotly_chart(fig, width="stretch")
 
 #######################################################
@@ -237,6 +246,15 @@ fig.update_traces(
         symmetric=False,
         array=df["erreur_sup"],
         arrayminus=df["erreur_inf"]
+    )
+)
+
+fig.update_layout(
+    legend=dict(
+        title="",
+        orientation="h",
+        yanchor="bottom",
+        y=1.0
     )
 )
 

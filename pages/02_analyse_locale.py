@@ -170,6 +170,15 @@ fig = px.bar(
 
 fig.update_xaxes(type="category")
 
+fig.update_layout(
+    legend=dict(
+        title="",
+        orientation="h",
+        yanchor="bottom",
+        y=1.0
+    )
+)
+
 st.plotly_chart(fig, width="stretch")
 ################################################
 
@@ -195,6 +204,16 @@ fig = px.scatter(
 )
 
 fig.update_xaxes(type="category")
+
+fig.update_layout(
+    legend=dict(
+        title="",
+        orientation="h",
+        yanchor="bottom",
+        y=1.0
+    )
+)
+
 st.plotly_chart(fig, width="stretch")
 ################################################
 pivot = df.pivot(
@@ -251,6 +270,15 @@ fig = px.scatter(
     size="Nombre d'événements",
     hover_name=st.session_state.echelle,
     color_discrete_map=color_map
+)
+
+fig.update_layout(
+    legend=dict(
+        title="",
+        orientation="h",
+        yanchor="bottom",
+        y=1.0
+    )
 )
 
 st.plotly_chart(fig, width="stretch")

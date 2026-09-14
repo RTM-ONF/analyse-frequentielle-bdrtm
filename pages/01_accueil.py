@@ -111,4 +111,13 @@ fig = px.bar(
     color_discrete_map=color_map
 )
 
+fig.update_layout(
+    legend=dict(
+        title="",
+        orientation="h",
+        yanchor="bottom",
+        y=1.0
+    )
+)
+
 st.plotly_chart(fig, width="stretch")
