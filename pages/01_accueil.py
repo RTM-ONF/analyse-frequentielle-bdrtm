@@ -29,6 +29,14 @@ st.header("Données")
 st.markdown(
     """
     Les données utilisées dans cette application sont issues d'une extraction de la BDRTM en date du **17 août 2026**.
+
+    - Une entrée correspond à un événement.
+    - Chaque événement est associé à une année et à un site.
+    - Un site appartient à un département.
+    - À un site peut être rattaché à plusieurs communes.
+    - À un site peut être rattaché à plusieurs EPCI.
+
+    **Important :** lorsqu'une analyse est réalisée à l'échelle des communes ou des EPCI, le nombre total d'événements affiché peut être supérieur au nombre d'événements initial. En effet, un même événement est comptabilisé pour chacune des communes ou chacun des EPCI intersectés par le site auquel il est rattaché.
     """
 )
 
