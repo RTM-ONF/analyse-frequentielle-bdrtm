@@ -87,7 +87,7 @@ if st.session_state.echelle == "Site":
 
 st.dataframe(df, hide_index=True)
 
-st.write(f"{len(df)} événements filtrés.")
+st.write(f"Nombre d'événements sélectionnés : {len(df)}")
 
 df = df.groupby(["Année", "Phénomène"]).size().reset_index(name="Nombre d'événements")
 
