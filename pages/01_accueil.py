@@ -31,7 +31,7 @@ st.markdown(
     Les données utilisées dans cette application sont issues d'une extraction de la BDRTM réalisée le 17 août 2026.
 
     - Une entrée correspond à un événement.
-    - Chaque événement est associé à une année et à un site.
+    - Chaque événement est associé à une année, à un site et à un phénomène.
     - Un site appartient à un département.
     - Un site peut être rattaché à plusieurs communes.
     - Un site peut être rattaché à plusieurs EPCI.
