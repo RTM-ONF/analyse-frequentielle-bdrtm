@@ -111,7 +111,7 @@ with st.sidebar:
     st.session_state.fiabilites = st.multiselect("Indicateurs qualitatifs de fiabilité",
                                                  fiabilites,
                                                  help="""
-                                                L'effet de ce filtre est visible dans les onglets d'analyse fréquentielle locale et gloable.
+                                                L'effet de ce filtre est visible dans les onglets d'analyse fréquentielle locale et globale.
                                                 """
                                     )
 
