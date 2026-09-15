@@ -40,7 +40,7 @@ st.markdown(
     """
 )
 
-st.write(f"Nombre d'événements : {len(st.session_state.df)}")
+st.write(f"Nombre total d'événements : {len(st.session_state.df)}")
 
 df = st.session_state.df
 
