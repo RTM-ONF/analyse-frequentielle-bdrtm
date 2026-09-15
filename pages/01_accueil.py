@@ -40,6 +40,8 @@ st.markdown(
     """
 )
 
+st.write(f"Nombre d'événements : {len(st.session_state.df)}")
+
 df = st.session_state.df
 
 if st.session_state.departements != []:
@@ -85,7 +87,7 @@ if st.session_state.echelle == "Site":
 
 st.dataframe(df, hide_index=True)
 
-st.write(f"{len(df)} événements.")
+st.write(f"{len(df)} événements filtrés.")
 
 df = df.groupby(["Année", "Phénomène"]).size().reset_index(name="Nombre d'événements")
 
