@@ -28,7 +28,7 @@ st.header("Données")
 
 st.markdown(
     """
-    Les données utilisées dans cette application sont issues d'une extraction de la BDRTM en date du **17 août 2026**.
+    Les données utilisées dans cette application sont issues d'une extraction de la BDRTM réalisée le 17 août 2026.
 
     - Une entrée correspond à un événement.
     - Chaque événement est associé à une année et à un site.
