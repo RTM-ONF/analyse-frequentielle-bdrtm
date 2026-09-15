@@ -55,7 +55,7 @@ if st.session_state.phenomenes != []:
     df = df[df["Phénomène"].isin(phenomenes)]
 
 if st.session_state.echelle == "Département":
-    df = df[["Département", "Année", "Phénomène"]]
+    df = df[["Département", "Année", "Site", "Phénomène"]]
 
 if st.session_state.echelle == "EPCI":
     df["EPCI"] = df["EPCI"].str.split(",")
@@ -65,7 +65,7 @@ if st.session_state.echelle == "EPCI":
         selection = [epci.strip() for epci in selection]
         df = df[df["EPCI"].isin(selection)]
 
-    df = df[["Département", "Année", "EPCI", "Phénomène"]]
+    df = df[["Département", "Année", "Site", "EPCI", "Phénomène"]]
 
 if st.session_state.echelle == "Commune":
     df["Commune"] = df["Commune"].str.split(";")
@@ -75,7 +75,7 @@ if st.session_state.echelle == "Commune":
         selection = [commune.strip() for commune in selection]
         df = df[df["Commune"].isin(selection)]
 
-    df = df[["Département", "Année", "Commune", "Phénomène"]]
+    df = df[["Département", "Année", "Site", "Commune", "Phénomène"]]
 
 if st.session_state.echelle == "Site":
     if st.session_state.selection != "":
