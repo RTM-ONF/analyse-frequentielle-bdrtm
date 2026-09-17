@@ -39,8 +39,6 @@ st.markdown(
     """
 )
 
-st.write(f"Nombre total d'événements : {len(st.session_state.df)}")
-
 df = st.session_state.df
 
 if st.session_state.departements != []:
@@ -86,6 +84,7 @@ if st.session_state.echelle == "Site":
 
 st.dataframe(df, hide_index=True)
 
+st.write(f"Nombre total d'événements : {len(st.session_state.df)}")
 st.write(f"Nombre d'événements sélectionnés : {len(df)}")
 
 df = df.groupby(["Année", "Phénomène"]).size().reset_index(name="Nombre d'événements")
