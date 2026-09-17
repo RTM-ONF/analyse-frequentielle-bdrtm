@@ -35,7 +35,7 @@ st.markdown(
     - Un site peut être rattaché à plusieurs communes.
     - Un site peut être rattaché à plusieurs EPCI.
 
-    **Important :** lorsqu'une analyse est réalisée à l'échelle des communes ou des EPCI, le nombre total d'événements affiché peut être supérieur au nombre d'événements initial. En effet, un même événement est comptabilisé pour chacune des communes ou chacun des EPCI intersectés par le site auquel il est rattaché.
+    **Important :** lorsqu'une analyse est réalisée à l'échelle des communes ou des EPCI, le nombre d'événements sélectionnés peut être supérieur au nombre total d'événements extraits de la BDRTM. En effet, un même événement est comptabilisé pour chacune des communes ou chacun des EPCI intersectés par le site auquel il est rattaché.
     """
 )
 
